@@ -1,0 +1,69 @@
+{
+  "source_system": "olist_ecommerce",
+  "landing_base_path": "abfss://landing@adlsolist.dfs.core.windows.net/olist_raw/",
+  "datasets": [
+    {
+      "table_name": "customers",
+      "file_pattern": "olist_customers_dataset*.csv",
+      "format": "csv",
+      "has_header": "true",
+      "delimiter": ","
+    },
+    {
+      "table_name": "orders",
+      "file_pattern": "olist_orders_dataset*.csv",
+      "format": "csv",
+      "has_header": "true",
+      "delimiter": ","
+    },
+    {
+      "table_name": "products",
+      "file_pattern": "olist_products_dataset*.csv",
+      "format": "csv",
+      "has_header": "true",
+      "delimiter": ","
+    },
+    {
+      "table_name": "geolocation",
+      "file_pattern": "olist_geolocation_dataset*.csv",
+      "format": "csv",
+      "has_header": "true",
+      "delimiter": ","
+    },
+    {
+      "table_name": "order_items",
+      "file_pattern": "olist_order_items_dataset*.csv",
+      "format": "csv",
+      "has_header": "true",
+      "delimiter": ","
+    },
+    {
+      "table_name": "order_payments",
+      "file_pattern": "olist_order_payments_dataset*.csv",
+      "format": "csv",
+      "has_header": "true",
+      "delimiter": ","
+    },
+    {
+      "table_name": "order_reviews",
+      "file_pattern": "olist_order_reviews_dataset*.csv",
+      "format": "csv",
+      "has_header": "true",
+      "delimiter": ","
+    },
+    {
+      "table_name": "sellers",
+      "file_pattern": "olist_sellers_dataset*.csv",
+      "format": "csv",
+      "has_header": "true",
+      "delimiter": ","
+    },
+    {
+      "table_name": "category_translation",
+      "file_pattern": "product_category_name_translation*.csv",
+      "format": "csv",
+      "has_header": "true",
+      "delimiter": ","
+    }
+  ]
+}
