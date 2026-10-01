@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS dev.bronze.ingestion_audit_log (
+CREATE TABLE IF NOT EXISTS olist_dev.bronze.ingestion_audit_log (
     log_id STRING COMMENT 'UUID generado en tiempo de ejecucion',
     table_name STRING,
     load_start_time TIMESTAMP,
