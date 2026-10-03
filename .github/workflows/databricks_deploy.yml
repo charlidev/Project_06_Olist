@@ -1,0 +1,33 @@
+name: Deploy to Databricks Prod
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+  DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+  REPO_ID: "2382117841813010"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Databricks CLI
+        run: |
+          curl -fsI https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
+          
+      - name: Update Databricks Git Folder
+        run: |
+          echo "Actualizando el repositorio de producción en Databricks..."
+          databricks repos update $REPO_ID --branch master
