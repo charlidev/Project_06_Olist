@@ -19,8 +19,21 @@ repo_path = args.repo_path
 # 2. Rutas dinámicas basadas en el entorno
 config_path = f"{repo_path}/config/ingestion_metadata.json"
 
-# 3. Checkpoint aislado por ambiente (¡La clave para que Prod lea los archivos!)
+# 3. Checkpoint aislado por ambiente
 checkpoint_base = f"abfss://bronze@adlsolist.dfs.core.windows.net/checkpoints/{env_catalog}/auto_loader/"
+
+# 4. Crear la tabla de auditoría si no existe en el catálogo actual
+spark.sql(f"""
+    CREATE TABLE IF NOT EXISTS {env_catalog}.bronze.ingestion_audit_log (
+        log_id STRING,
+        table_name STRING,
+        load_start_time TIMESTAMP,
+        load_end_time TIMESTAMP,
+        status STRING,
+        records_inserted INT,
+        error_message STRING
+    )
+""")
 
 def log_audit(table_name, status, error_msg=""):
     """Inserta un registro en la tabla de control"""
@@ -50,11 +63,8 @@ print(f"Leyendo configuración desde: {config_path}")
 for dataset in metadata["datasets"]:
     table_name = dataset["table_name"]
     
-    # Extraer el nombre de la carpeta a partir del file_pattern 
-    # (ej. "olist_customers_dataset*.csv" -> "olist_customers_dataset")
+    # Extraer el nombre de la carpeta a partir del file_pattern
     folder_name = dataset["file_pattern"].replace("*.csv", "")
-    
-    # Ahora apuntamos a la carpeta que coincide con cómo las nombraste en Azure
     source_path = f"{landing_base_path}{folder_name}/" 
     checkpoint_path = f"{checkpoint_base}{table_name}"
     
