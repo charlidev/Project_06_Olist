@@ -1,17 +1,20 @@
+import argparse
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, current_timestamp, expr
-from pyspark.dbutils import DBUtils
 
 # Inicializar Spark
 spark = SparkSession.builder.getOrCreate()
-dbutils = DBUtils(spark)
 
-try:
-    env_catalog = dbutils.widgets.get("env_catalog")
-except:
-    env_catalog = "olist_dev"
+# Obtener parámetros vía línea de comandos (Reemplazo de dbutils)
+parser = argparse.ArgumentParser()
+parser.add_argument("--env_catalog", default="olist_dev")
+parser.add_argument("--repo_path", default="/Workspace/Users/dani149810@gmail.com/Project_06_Olist")
+args, unknown = parser.parse_known_args()
 
-print("Procesando tablas restantes para la capa Silver...")
+env_catalog = args.env_catalog
+repo_path = args.repo_path
+
+print(f"Procesando tablas restantes para la capa Silver en {env_catalog}...")
 
 # Diccionario de configuración por tabla
 tables_config = {
