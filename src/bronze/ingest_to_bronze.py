@@ -1,20 +1,26 @@
 import json
 import uuid
+import argparse
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import current_timestamp, col
-from pyspark.dbutils import DBUtils
 
-# Inicializar Spark y DBUtils
+# Inicializar Spark
 spark = SparkSession.builder.getOrCreate()
-dbutils = DBUtils(spark)
 
-# Obtener parámetros (ej. dev, test, prod)
-dbutils.widgets.text("env_catalog", "olist_dev")
-env_catalog = dbutils.widgets.get("env_catalog")
+# 1. Obtener parámetros vía línea de comandos (Compatible con Workflows)
+parser = argparse.ArgumentParser()
+parser.add_argument("--env_catalog", default="olist_dev")
+parser.add_argument("--repo_path", default="/Workspace/Users/dani149810@gmail.com/Project_06_Olist")
+args, unknown = parser.parse_known_args()
 
-# Rutas base
-config_path = "/Workspace/Users/dani149810@gmail.com/Project_06_Olist/config/ingestion_metadata.json"
-checkpoint_base = "abfss://bronze@adlsolist.dfs.core.windows.net/checkpoints/auto_loader/"
+env_catalog = args.env_catalog
+repo_path = args.repo_path
+
+# 2. Rutas dinámicas basadas en el entorno
+config_path = f"{repo_path}/config/ingestion_metadata.json"
+
+# 3. Checkpoint aislado por ambiente (¡La clave para que Prod lea los archivos!)
+checkpoint_base = f"abfss://bronze@adlsolist.dfs.core.windows.net/checkpoints/{env_catalog}/auto_loader/"
 
 def log_audit(table_name, status, error_msg=""):
     """Inserta un registro en la tabla de control"""
@@ -38,6 +44,7 @@ except Exception as e:
 landing_base_path = metadata["landing_base_path"]
 
 print(f"Iniciando ingesta incremental a capa Bronze en el catálogo: {env_catalog}")
+print(f"Leyendo configuración desde: {config_path}")
 
 # Iterar sobre cada dataset del JSON
 for dataset in metadata["datasets"]:
