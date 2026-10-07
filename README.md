@@ -74,22 +74,6 @@ El namespace de tres niveles será:
 catalog.schema.table
 ```
 
-Ejemplos:
-
-```text
-olist_dev.bronze.orders
-olist_dev.silver.orders
-olist_dev.gold.fact_orders
-```
-
-Ejemplos para producción:
-
-```text
-olist_prod.bronze.orders
-olist_prod.silver.orders
-olist_prod.gold.fact_orders
-```
-
 ---
 
 ## 4. ¿Por qué separar los ambientes mediante catálogos?
@@ -210,14 +194,6 @@ fact_payments
 fact_reviews
 ```
 
-Posteriormente podrían agregarse hechos relacionados con:
-
-```text
-inventory
-purchases
-supplier activity
-```
-
 Gold será la principal fuente de consumo para Power BI y analítica avanzada.
 
 ---
@@ -228,61 +204,17 @@ Propósito:
 
 Almacenar metadata técnica necesaria para operar la plataforma.
 
-Ejemplos:
-
-```text
-ingestion_config
-pipeline_runs
-data_quality_results
-schema_versions
-```
-
 Este schema soportará las capacidades de arquitectura metadata-driven y observabilidad del proyecto.
 
 Las tablas de metadata se consideran activos de la plataforma y no datasets de negocio.
 
 ---
 
-## 6. Estrategia de Quarantine
-
-Los registros inválidos no deberán mezclarse con los datos confiables de Silver.
-
-La estructura lógica será:
-
-```text
-Silver
-│
-├── Registros válidos
-│       ↓
-│      Gold
-│
-└── Registros inválidos
-        ↓
-    Quarantine
-```
-
-La implementación concreta de quarantine se definirá durante la etapa de Data Quality.
-
-La organización física podrá ser:
-
-```text
-olist_dev.silver
-olist_dev.gold
-olist_dev.metadata
-olist_dev.quarantine
-```
-
-Si posteriormente se requieren controles de seguridad o ciclos de vida independientes, Quarantine podrá implementarse como un schema dedicado.
-
-En la arquitectura inicial, `quarantine` se considera una extensión opcional y no un schema obligatorio de la base.
-
----
-
-## 7. Estrategia de Almacenamiento
+## 6. Estrategia de Almacenamiento
 
 El proyecto distinguirá entre el almacenamiento de origen y el almacenamiento administrado por el lakehouse.
 
-### 7.1 Fuente / Landing
+### 6.1 Fuente / Landing
 
 Los archivos CSV de Olist ya existen en ADLS Gen2:
 
@@ -296,7 +228,7 @@ Su ciclo de vida estará asociado al proceso de ingesta.
 
 ---
 
-### 7.2 Managed Storage de Unity Catalog
+### 6.2 Managed Storage de Unity Catalog
 
 Las tablas Bronze, Silver, Gold y Metadata utilizarán, siempre que sea práctico, almacenamiento administrado por Unity Catalog.
 
@@ -327,7 +259,7 @@ en lugar de depender de rutas físicas hardcodeadas.
 
 ---
 
-## 8. Estrategia de External Location
+## 7. Estrategia de External Location
 
 La Landing Zone de Olist será accedida mediante los mecanismos de control de almacenamiento de Unity Catalog.
 
@@ -349,7 +281,7 @@ Las external locations se utilizarán para aquellas rutas que deban permanecer e
 
 ---
 
-## 9. Aislamiento de Producción
+## 8. Aislamiento de Producción
 
 El catálogo de producción deberá mantenerse aislado de los workloads de desarrollo y pruebas tanto como lo permita la arquitectura del workspace disponible.
 
@@ -374,7 +306,7 @@ La promoción a producción ocurrirá mediante el pipeline de despliegue definid
 
 ---
 
-## 10. Modelo de Permisos
+## 9. Modelo de Permisos
 
 El acceso seguirá el principio de mínimo privilegio.
 
@@ -394,7 +326,7 @@ Cuando sea posible, los permisos deberán asignarse a grupos o service principal
 
 ---
 
-## 11. Flujo de Desarrollo
+## 10. Flujo de Desarrollo
 
 El desarrollo seguirá conceptualmente este flujo:
 
@@ -424,7 +356,7 @@ No se deberá realizar desarrollo manual directamente en producción.
 
 ---
 
-## 12. Compatibilidad con CI/CD
+## 11. Compatibilidad con CI/CD
 
 La arquitectura de ambientes se diseñará desde el principio para permitir despliegues automatizados.
 
@@ -453,7 +385,7 @@ Esto permitirá promover el mismo código fuente entre ambientes.
 
 ---
 
-## 13. Configuración por Ambiente
+## 12. Configuración por Ambiente
 
 La configuración específica de cada ambiente deberá mantenerse separada de la lógica de negocio.
 
@@ -485,86 +417,9 @@ en lugar de:
 ```python
 catalog = "olist_prod"
 ```
-
 ---
 
-## 14. Estándares de Nombres
-
-Catálogos:
-
-```text
-olist_dev
-olist_test
-olist_prod
-```
-
-Schemas:
-
-```text
-bronze
-silver
-gold
-metadata
-quarantine
-```
-
-Tablas:
-
-```text
-customers
-orders
-order_items
-order_payments
-order_reviews
-products
-sellers
-```
-
-Tablas dimensionales:
-
-```text
-dim_customer
-dim_product
-dim_seller
-dim_date
-dim_geography
-```
-
-Tablas de hechos:
-
-```text
-fact_orders
-fact_order_items
-fact_payments
-fact_reviews
-```
-
-Columnas técnicas:
-
-```text
-_ingestion_timestamp
-_source_file
-_run_id
-_record_hash
-```
-
-Columnas SCD Type 2:
-
-```text
-effective_start_date
-effective_end_date
-is_current
-```
-
-La convención completa de nombres se mantendrá separadamente en:
-
-```text
-docs/naming_conventions.md
-```
-
----
-
-## 15. Principios Arquitectónicos
+## 13. Principios Arquitectónicos
 
 El proyecto seguirá los siguientes principios:
 
@@ -605,7 +460,7 @@ Las tablas estructuradas del lakehouse deberán utilizar managed storage de Unit
 
 ---
 
-## 16. Arquitectura Objetivo
+## 14. Arquitectura Objetivo
 
 La arquitectura de ambientes resultante será:
 
@@ -660,7 +515,7 @@ CI/CD
 
 ---
 
-## 17. Resumen de Decisiones
+## 15. Resumen de Decisiones
 
 | Decisión                  | Enfoque seleccionado                    |
 | ------------------------- | --------------------------------------- |
@@ -679,7 +534,7 @@ CI/CD
 
 ---
 
-## 18. Extensiones Futuras
+## 16. Extensiones Futuras
 
 Esta arquitectura está preparada para incorporar las siguientes etapas:
 
@@ -699,25 +554,3 @@ Power BI
 
 Ningún componente futuro deberá incorporarse únicamente por motivos tecnológicos. Cada componente debe tener un propósito definido y justificar su impacto arquitectónico.
 
----
-
-## 19. Definition of Done
-
-La etapa 0.3 se considera terminada cuando:
-
-```text
-[ ] Modelo de ambientes documentado
-[ ] Estructura de Unity Catalog definida
-[ ] Naming de catálogos definido
-[ ] Responsabilidad de cada schema documentada
-[ ] Estrategia de almacenamiento documentada
-[ ] Estrategia de aislamiento de producción documentada
-[ ] Estrategia de permisos documentada
-[ ] Compatibilidad con CI/CD documentada
-[ ] Estrategia de configuración por ambiente documentada
-[ ] Arquitectura objetivo documentada
-```
-
-Una vez completada esta etapa, el proyecto puede continuar con:
-
-**Etapa 0.4 — Acceso a Storage y Seguridad**
